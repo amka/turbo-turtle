@@ -1,0 +1,39 @@
+@using TurboTurtle.Models
+<MudText Typo="Typo.h3">Issues</MudText>
+
+<MudCard>
+    <MudCardContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" Placeholder="Что делать?"/>
+        </MudForm>
+    </MudCardContent>
+</MudCard>
+
+@if (Issues == null)
+{
+    <MudProgressCircular Indeterminate="true"/>
+}
+else
+{
+    <MudList>
+        @foreach (var issue in Issues)
+        {
+            <MudListItem>
+                @issue.Title
+            </MudListItem>
+        }
+    </MudList>
+}
+
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudForm form;
+    IEnumerable<Issue> Issues { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+}
