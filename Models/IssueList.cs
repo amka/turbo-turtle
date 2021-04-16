@@ -5,7 +5,7 @@ namespace TurboTurtle.Models
 {
     public class IssueList
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public bool Done { get; set; } = false;
         public DateTime Created { get; set; } = DateTime.UtcNow;

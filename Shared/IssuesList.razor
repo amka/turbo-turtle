@@ -1,39 +1,103 @@
 @using TurboTurtle.Models
-<MudText Typo="Typo.h3">Issues</MudText>
+@using TurboTurtle.Services
+@inject IssueService IssueService
+@inject MessageService _message
 
-<MudCard>
-    <MudCardContent>
-        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-            <MudTextField T="string" Placeholder="Что делать?"/>
-        </MudForm>
-    </MudCardContent>
-</MudCard>
 
-@if (Issues == null)
+<div>
+    <PageHeader Title="Issues List"/>
+    <Row>
+        <Col Span="24">
+
+            <Form Loading="loading" Model="form" OnFinish="SubmitIssue">
+                <Input @bind-Value="form.Title" Placeholder="Что делать?"/>
+            </Form>
+        </Col>
+    </Row>
+</div>
+
+@if (issues == null)
 {
-    <MudProgressCircular Indeterminate="true"/>
+    <Empty Simple/>
 }
 else
 {
-    <MudList>
-        @foreach (var issue in Issues)
-        {
-            <MudListItem>
-                @issue.Title
-            </MudListItem>
-        }
-    </MudList>
+    <AntList DataSource="@issues" ItemLayout="ListItemLayout.Horizontal">
+        <ChildContent Context="item">
+            <ListItem>
+                <ListItemMeta>
+                    <AvatarTemplate>
+                        <Checkbox Checked="@item.Done"/>
+                    </AvatarTemplate>
+                    <TitleTemplate>
+                        <Text>@item.Title</Text>
+                    </TitleTemplate>
+                    <DescriptionTemplate>
+                        <div>@item.Created</div>
+                    </DescriptionTemplate>
+                </ListItemMeta>
+
+                <Popconfirm Title="Are you sure delete this task?"
+                            OnConfirm="() => RemoveIssue(item.Id)"
+                            OkText="Yes"
+                            CancelText="No">
+                    <a>Delete</a>
+                </Popconfirm>
+            </ListItem>
+        </ChildContent>
+    </AntList>
 }
 
 
 @code {
     bool success;
-    string[] errors = { };
-    MudForm form;
-    IEnumerable<Issue> Issues { get; set; }
+    bool loading = true;
+    string[] errors = {};
+    CreateIssueForm form = new CreateIssueForm();
+    EditContext _editContext;
+
+    IEnumerable<Issue> issues { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        _editContext = new EditContext(form);
+        await ReloadIssues();
     }
 
+    async Task ReloadIssues()
+    {
+        issues = await IssueService.GetIssuesAsync();
+        loading = false;
+        StateHasChanged();
+    }
+
+    async Task SubmitIssue()
+    {
+        if (_editContext.Validate())
+        {
+            var entity = new Issue
+            {
+                Title = form.Title
+            };
+
+            loading = true;
+            await IssueService.CreateIssueAsync(entity);
+
+            await ReloadIssues();
+            await _message.Success("Issue created!");
+        }
+
+        form = new CreateIssueForm();
+    }
+
+    async Task RemoveIssue(Guid issueId)
+    {
+        var result = await IssueService.RemoveIssueAsync(issueId);
+        if (result) {
+            await ReloadIssues();
+            await _message.Success("Issue removed");
+        } else {
+            await _message.Error("Cannot remove item");
+        }
+    }
 }

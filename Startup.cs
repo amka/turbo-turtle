@@ -13,10 +13,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MudBlazor.Services;
 using TurboTurtle.Areas.Identity;
 using TurboTurtle.Data;
 using TurboTurtle.Models;
+using TurboTurtle.Services;
 
 namespace TurboTurtle
 {
@@ -40,11 +40,14 @@ namespace TurboTurtle
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services
+                .AddScoped<AuthenticationStateProvider,
+                    RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
-            
-            services.AddMudServices();
+            services.AddTransient<IssueService>();
+
+            services.AddAntDesign();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

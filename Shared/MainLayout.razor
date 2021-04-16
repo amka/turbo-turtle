@@ -1,32 +1,27 @@
 @inherits LayoutComponentBase
 
-<MudThemeProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
-
-<MudLayout>
-    <MudAppBar Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        <MudText Typo="Typo.h5" Class="ml-3">Turbo Turtle</MudText>
-        <MudAppBarSpacer/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
-    </MudAppBar>
-
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+<Layout Style="height: 100%">
+    <Layout>
+        <Header>
+            <Title Level="1">Turbo Turtle</Title>
+        </Header>
+        <Content Style="padding: 0 50px;">
+            @Body
+        </Content>
+    </Layout>
+</Layout>
 
 
 @code {
-    bool _drawerOpen = true;
+    bool collapsed = true;
 
-    void DrawerToggle()
+    void toggle()
     {
-        _drawerOpen = !_drawerOpen;
+        collapsed = !collapsed;
     }
-
+    
+    void OnCollapse(bool isCollapsed)
+    {
+        Console.WriteLine($"Collapsed: {isCollapsed}");
+    }
 }
